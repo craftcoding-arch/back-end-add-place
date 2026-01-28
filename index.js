@@ -54,16 +54,30 @@ app.get('/applock',authenticate , async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-app.get('/place',authenticate, async (req, res) => {
+app.post('/place', authenticate, async (req, res) => {
   try {
-    const url = `${uri1}/data/${TABLE_NAME3}`;
-    const response = await fetch(url);
+    
+
+    const response = await fetch(`${uri1}/data/${TABLE_NAME3}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(req.body),
+    });
+
     const data = await response.json();
-    res.json(data); // نعيد البيانات للمتصفح بدون كشف المفاتيح
+
+    if (!response.ok) {
+      return res.status(response.status).json(data);
+    }
+
+    res.status(201).json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // تشغيل السيرفر
 app.listen(PORT, () => {
